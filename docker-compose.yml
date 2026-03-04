@@ -1,0 +1,82 @@
+version: "3.9"
+
+services:
+
+  postgres:
+    image: postgres:15
+    container_name: nexora-postgres
+    environment:
+      POSTGRES_USER: nexora
+      POSTGRES_PASSWORD: nexora123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - nexora-network
+
+  discovery-service:
+    build: ../nexora-discovery-service
+    container_name: nexora-discovery
+    networks:
+      - nexora-network
+
+  api-gateway:
+    build: ../nexora-api-gateway
+    container_name: nexora-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - discovery-service
+    networks:
+      - nexora-network
+
+  auth-service:
+    build: ../nexora-auth-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/nexora_auth_db
+    depends_on:
+      - postgres
+    networks:
+      - nexora-network
+
+  tenant-service:
+    build: ../nexora-tenant-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/nexora_tenant_db
+    depends_on:
+      - postgres
+    networks:
+      - nexora-network
+
+  user-service:
+    build: ../nexora-user-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/nexora_user_db
+    depends_on:
+      - postgres
+    networks:
+      - nexora-network
+
+  subscription-service:
+    build: ../nexora-subscription-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/nexora_subscription_db
+    depends_on:
+      - postgres
+    networks:
+      - nexora-network
+
+  billing-service:
+    build: ../nexora-billing-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/nexora_billing_db
+    depends_on:
+      - postgres
+    networks:
+      - nexora-network
+
+volumes:
+  postgres_data:
+
+networks:
+  nexora-network:
