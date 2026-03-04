@@ -9,7 +9,11 @@ services:
       POSTGRES_USER: nexora
       POSTGRES_PASSWORD: nexora123
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - auth_db_data:/var/lib/postgresql/data/auth
+      - tenant_db_data:/var/lib/postgresql/data/tenant
+      - user_db_data:/var/lib/postgresql/data/user
+      - subscription_db_data:/var/lib/postgresql/data/subscription
+      - billing_db_data:/var/lib/postgresql/data/billing
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
       - nexora-network
@@ -34,6 +38,8 @@ services:
     build: ../nexora-auth-service
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/nexora_auth_db
+      SPRING_DATASOURCE_USERNAME: nexora
+      SPRING_DATASOURCE_PASSWORD: nexora123
     depends_on:
       - postgres
     networks:
@@ -43,6 +49,8 @@ services:
     build: ../nexora-tenant-service
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/nexora_tenant_db
+      SPRING_DATASOURCE_USERNAME: nexora
+      SPRING_DATASOURCE_PASSWORD: nexora123
     depends_on:
       - postgres
     networks:
@@ -52,6 +60,8 @@ services:
     build: ../nexora-user-service
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/nexora_user_db
+      SPRING_DATASOURCE_USERNAME: nexora
+      SPRING_DATASOURCE_PASSWORD: nexora123
     depends_on:
       - postgres
     networks:
@@ -61,6 +71,8 @@ services:
     build: ../nexora-subscription-service
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/nexora_subscription_db
+      SPRING_DATASOURCE_USERNAME: nexora
+      SPRING_DATASOURCE_PASSWORD: nexora123
     depends_on:
       - postgres
     networks:
@@ -70,13 +82,19 @@ services:
     build: ../nexora-billing-service
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/nexora_billing_db
+      SPRING_DATASOURCE_USERNAME: nexora
+      SPRING_DATASOURCE_PASSWORD: nexora123
     depends_on:
       - postgres
     networks:
       - nexora-network
 
 volumes:
-  postgres_data:
+  auth_db_data:
+  tenant_db_data:
+  user_db_data:
+  subscription_db_data:
+  billing_db_data:
 
 networks:
   nexora-network:
